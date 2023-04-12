@@ -30,38 +30,40 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: ListView(
-                    children: [
-                      ...LocalDb.getGeos().reversed.map(
-                            (e) => Text(e),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ListView(
+                  children: [
+                    ...LocalDb.getGeos().reversed.map(
+                          (e) => Text(e),
+                        ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  children: [
+                    ...LocalDb.getErrors().reversed.map(
+                          (e) => Column(
+                            children: [
+                              Divider(color: Colors.red),
+                              Text(e, style: const TextStyle(color: Colors.red)),
+                            ],
                           ),
-                    ],
-                  ),
+                        ),
+                  ],
                 ),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      ...LocalDb.getErrors().reversed.map(
-                            (e) => Text(e, style: const TextStyle(color: Colors.red)),
-                          ),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: _refresh,
-                  child: const Text('Обновить'),
-                ),
-              ],
-            ),
+              ),
+              ElevatedButton(
+                onPressed: _refresh,
+                child: Text('Обновить'),
+              ),
+            ],
           ),
         ),
       ),

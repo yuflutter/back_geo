@@ -16,13 +16,14 @@ class LocalDb {
     }
   }
 
-  static Future<void> reload() async {
-    await _db.reload();
-  }
+  static Future<void> reload() => _db.reload();
 
   static List<String> getGeos() => _db.getStringList(_geosKey) ?? [];
   static Future<void> addGeo(String geo) => _db.setStringList(_geosKey, getGeos()..add(geo));
 
   static List<String> getErrors() => _db.getStringList(_errorsKey) ?? [];
-  static Future<void> addError(dynamic e, [StackTrace? s]) => _db.setStringList(_errorsKey, getErrors()..add('$e\n$s'));
+  static Future<void> addError(dynamic e, [StackTrace? s]) async {
+    print('$e\n$s');
+    await _db.setStringList(_errorsKey, getErrors()..add('$e\n$s'));
+  }
 }
