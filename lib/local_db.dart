@@ -23,7 +23,8 @@ class LocalDb {
 
   static List<String> getErrors() => _db.getStringList(_errorsKey) ?? [];
   static Future<void> addError(dynamic e, [StackTrace? s]) async {
-    print('$e\n$s');
-    await _db.setStringList(_errorsKey, getErrors()..add('$e\n$s'));
+    final txt = (s != null) ? '$e\n$s' : '$e';
+    print(txt);
+    await _db.setStringList(_errorsKey, getErrors()..add(txt));
   }
 }

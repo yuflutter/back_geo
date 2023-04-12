@@ -30,9 +30,9 @@ class BackgroundGeo {
     await Workmanager().registerPeriodicTask(
       _taskName,
       '$_taskName-01',
-      frequency: const Duration(minutes: 5), // в андроиде меньше 15 нельзя
+      frequency: const Duration(minutes: 5), // реально в андроиде все равно будет 15
       backoffPolicy: BackoffPolicy.linear,
-      backoffPolicyDelay: Duration(seconds: 30),
+      //backoffPolicyDelay: Duration(seconds: 30),
     );
   }
 }
@@ -57,14 +57,14 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
     // }
     // final geo = await _loc.getLocation();
     final geo = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.best,
-      forceAndroidLocationManager: true,
-      timeLimit: const Duration(seconds: 30),
+      desiredAccuracy: LocationAccuracy.high,
+      // forceAndroidLocationManager: true,
+      timeLimit: const Duration(seconds: 45),
     );
     await LocalDb.addGeo('${geo.latitude}, ${geo.longitude}');
     return false; // перезапускаем задачу, как будто возникла ошибка
   } catch (e, s) {
-    LocalDb.addError(e, s); // без await, игнорим ошибку записи ошибки
+    LocalDb.addError(e, s); // без await, игнорим возможную ошибку записи ошибки
     return false;
   }
 }

@@ -32,7 +32,7 @@ class _HomeScreen extends State<HomeScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(5),
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
