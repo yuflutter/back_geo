@@ -30,7 +30,7 @@ void backgroundDispatcher() {
       await LocalDb.init();
       final geo = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 30),
+        // timeLimit: const Duration(seconds: 30),
       );
       await LocalDb.addGeo('${geo.latitude}, ${geo.longitude}');
       return true;

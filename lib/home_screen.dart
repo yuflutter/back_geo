@@ -29,34 +29,37 @@ class _HomeScreen extends State<HomeScreen> {
 
   @override
   build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: ListView(
-                children: [
-                  ...LocalDb.getGeos().reversed.map(
-                        (e) => Text(e),
-                      ),
-                ],
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ListView(
+                  children: [
+                    ...LocalDb.getGeos().reversed.map(
+                          (e) => Text(e),
+                        ),
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: ListView(
-                children: [
-                  ...LocalDb.getErrors().reversed.map(
-                        (e) => Text(e, style: const TextStyle(color: Colors.red)),
-                      ),
-                ],
+              Expanded(
+                child: ListView(
+                  children: [
+                    ...LocalDb.getErrors().reversed.map(
+                          (e) => Text(e, style: const TextStyle(color: Colors.red)),
+                        ),
+                  ],
+                ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: _refresh,
-              child: const Text('Обновить'),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: _refresh,
+                child: const Text('Обновить'),
+              ),
+            ],
+          ),
         ),
       ),
     );
