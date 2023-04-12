@@ -43,6 +43,15 @@ class _HomeScreen extends State<HomeScreen> {
                 ],
               ),
             ),
+            Expanded(
+              child: ListView(
+                children: [
+                  ...LocalDb.getErrors().reversed.map(
+                        (e) => Text(e, style: const TextStyle(color: Colors.red)),
+                      ),
+                ],
+              ),
+            ),
             ElevatedButton(
               onPressed: _refresh,
               child: const Text('Обновить'),
