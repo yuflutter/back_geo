@@ -10,9 +10,6 @@ class BackgroundGeo {
   // static late final Location _loc;
 
   static Future<void> init() async {
-    if ((await Geolocator.checkPermission()) == LocationPermission.denied) {
-      await Geolocator.requestPermission();
-    }
     // _loc = Location();
     // if (!(await _loc.serviceEnabled()) && !(await _loc.requestService())) {
     //   LocalDb.addError('Включите геолокацию');
@@ -23,6 +20,9 @@ class BackgroundGeo {
     //   LocalDb.addError('Предоставьте разрешения');
     //   return;
     // }
+    if ((await Geolocator.checkPermission()) == LocationPermission.denied) {
+      await Geolocator.requestPermission();
+    }
     await Workmanager().initialize(
       _backgroundDispatcher,
       isInDebugMode: true,
