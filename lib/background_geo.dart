@@ -36,7 +36,7 @@ void backgroundDispatcher() {
       return true;
     } catch (e, s) {
       print('$e\n$s');
-      LocalDb.addError(e, s);
+      await LocalDb.addError(e, s);
       return false;
     }
   });
