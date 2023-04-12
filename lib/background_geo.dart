@@ -1,5 +1,6 @@
 import 'package:workmanager/workmanager.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'local_db.dart';
 
@@ -18,6 +19,7 @@ class BackgroundGeo {
       _taskName,
       '$_taskName-01',
       // frequency: const Duration(seconds: 30), // really 15 min
+      backoffPolicy: BackoffPolicy.linear,
     );
   }
 }
@@ -35,7 +37,7 @@ void backgroundDispatcher() {
       return true;
     } catch (e, s) {
       print('$e\n$s');
-      return Future.error(e, s);
+      return false;
     }
   });
 }
