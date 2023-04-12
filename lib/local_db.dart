@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _geosKey = 'geos';
@@ -19,12 +20,14 @@ class LocalDb {
   static Future<void> reload() => _db.reload();
 
   static List<String> getGeos() => _db.getStringList(_geosKey) ?? [];
-  static Future<void> addGeo(String geo) => _db.setStringList(_geosKey, getGeos()..add(geo));
+  static Future<void> addGeo(Map geo) async {
+    await _db.setStringList(_geosKey, getGeos()..add(geo.toString()));
+  }
 
   static List<String> getErrors() => _db.getStringList(_errorsKey) ?? [];
-  static Future<void> addError(dynamic e, [StackTrace? s]) async {
-    final txt = (s != null) ? '$e\n$s' : '$e';
-    print(txt);
-    await _db.setStringList(_errorsKey, getErrors()..add(txt));
+  static Future<void> addError(dynamic error, [StackTrace? stack]) async {
+    final s = (stack != null) ? '$error\n$stack' : '$error';
+    log(s);
+    await _db.setStringList(_errorsKey, getErrors()..add(s));
   }
 }

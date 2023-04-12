@@ -7,8 +7,6 @@ import 'local_db.dart';
 const _taskName = 'backgroundGeo';
 
 class BackgroundGeo {
-  // static late final Location _loc;
-
   static Future<void> init() async {
     // _loc = Location();
     // if (!(await _loc.serviceEnabled()) && !(await _loc.requestService())) {
@@ -30,9 +28,9 @@ class BackgroundGeo {
     await Workmanager().registerPeriodicTask(
       _taskName,
       '$_taskName-01',
-      frequency: const Duration(minutes: 5), // реально в андроиде все равно будет 15
+      frequency: Duration(minutes: 5), // реально в андроиде все равно будет 15
       backoffPolicy: BackoffPolicy.linear,
-      //backoffPolicyDelay: Duration(seconds: 30),
+      backoffPolicyDelay: Duration(seconds: 30),
     );
   }
 }
@@ -58,10 +56,10 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
     // final geo = await _loc.getLocation();
     final geo = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
+      timeLimit: Duration(seconds: 45),
       // forceAndroidLocationManager: true,
-      timeLimit: const Duration(seconds: 45),
     );
-    await LocalDb.addGeo('${geo.latitude}, ${geo.longitude}');
+    await LocalDb.addGeo({'t': DateTime.now(), 'la': geo.latitude, 'lo': geo.longitude});
     return false; // перезапускаем задачу, как будто возникла ошибка
   } catch (e, s) {
     LocalDb.addError(e, s); // без await, игнорим возможную ошибку записи ошибки
