@@ -10,11 +10,14 @@ class BackgroundGeo {
     if ((await Geolocator.checkPermission()) == LocationPermission.denied) {
       await Geolocator.requestPermission();
     }
-    await Workmanager().initialize(backgroundDispatcher);
+    await Workmanager().initialize(
+      backgroundDispatcher,
+      isInDebugMode: true,
+    );
     await Workmanager().registerPeriodicTask(
       _taskName,
       '$_taskName-01',
-      frequency: const Duration(seconds: 10), // really 15 min
+      // frequency: const Duration(seconds: 30), // really 15 min
     );
   }
 }

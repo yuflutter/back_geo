@@ -16,14 +16,14 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   initState() {
     _timer = Timer.periodic(
-      const Duration(seconds: 10),
+      const Duration(seconds: 30),
       (_) => _refresh(),
     );
     super.initState();
   }
 
   Future<void> _refresh() async {
-    LocalDb.reload();
+    await LocalDb.reload();
     setState(() {});
   }
 
