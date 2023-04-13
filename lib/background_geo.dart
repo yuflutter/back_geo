@@ -28,14 +28,15 @@ class BackgroundGeo {
     if ((await Geolocator.checkPermission()) != LocationPermission.always) {
       await Geolocator.openAppSettings();
     }
+    await Workmanager().cancelAll();
     await Workmanager().initialize(
       _backgroundDispatcher,
       isInDebugMode: true,
     );
     await Workmanager().registerPeriodicTask(
       _taskName,
-      '$_taskName-1',
-      frequency: Duration(minutes: 15), // реально в андроиде все равно будет 15
+      '$_taskName-${await LocalDb.incLastTaskId()}',
+      // frequency: Duration(minutes: 15), // реально в андроиде все равно будет 15
       backoffPolicy: BackoffPolicy.linear,
       backoffPolicyDelay: Duration(seconds: 45),
     );

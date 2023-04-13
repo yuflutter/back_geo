@@ -5,6 +5,7 @@ import '/geo.dart';
 
 const _allGeosKey = 'allGeos';
 const _lastGeoKey = 'lastGeo';
+const _lastTaskIdKey = 'lastTaskId';
 const _allErrorsKey = 'allErrors';
 
 class LocalDb {
@@ -33,6 +34,12 @@ class LocalDb {
       _db.setStringList(_allGeosKey, allGeosJson..add(geoJson)),
       _db.setString(_lastGeoKey, geoJson),
     ]);
+  }
+
+  static Future<int> incLastTaskId() async {
+    final id = (_db.getInt(_lastTaskIdKey) ?? 0) + 1;
+    await _db.setInt(_lastTaskIdKey, id);
+    return id;
   }
 
   static List<String> get allErrors => _db.getStringList(_allErrorsKey) ?? [];
