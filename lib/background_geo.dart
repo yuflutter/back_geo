@@ -34,7 +34,7 @@ class BackgroundGeo {
     );
     await Workmanager().registerPeriodicTask(
       _taskName,
-      _taskName,
+      '$_taskName-1',
       frequency: Duration(minutes: 15), // реально в андроиде все равно будет 15
       backoffPolicy: BackoffPolicy.linear,
       backoffPolicyDelay: Duration(seconds: 45),
@@ -50,7 +50,7 @@ void _backgroundDispatcher() {
 Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async {
   await LocalDb.init();
   final taskStart = DateTime.now();
-  do {
+  while (true) {
     final measureStart = DateTime.now();
     try {
       // final _loc = Location();
@@ -75,7 +75,6 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
         lat: pos.latitude,
         lon: pos.longitude,
       ));
-      await Future.delayed(Duration(seconds: 60));
       // return false; // перезапускаем задачу, как будто возникла ошибка
     } catch (e, s) {
       LocalDb.addError(e, s); // без await, игнорим возможную ошибку записи ошибки
@@ -86,6 +85,11 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
       ));
       // return false;
     }
-  } while (DateTime.now().difference(taskStart).inMinutes < 14);
+    if (DateTime.now().difference(taskStart).inMinutes <= 13) {
+      await Future.delayed(Duration(seconds: 60));
+    } else {
+      break;
+    }
+  }
   return true;
 }
