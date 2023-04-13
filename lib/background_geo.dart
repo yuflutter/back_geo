@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '/geo.dart';
 import '/local_db.dart';
 
-const _taskName = 'backgroundGeo';
+const _taskName = 'back-geo';
 
 class BackgroundGeo {
   static Future<void> init() async {
@@ -36,9 +36,11 @@ class BackgroundGeo {
     await Workmanager().registerPeriodicTask(
       _taskName,
       '$_taskName-${await LocalDb.incLastTaskId()}',
-      // frequency: Duration(minutes: 15), // реально в андроиде все равно будет 15
+      frequency: Duration(minutes: 15), // реально в андроиде все равно будет 15
+      existingWorkPolicy: ExistingWorkPolicy.append,
       backoffPolicy: BackoffPolicy.linear,
       backoffPolicyDelay: Duration(seconds: 45),
+      // outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
     );
   }
 }
@@ -72,6 +74,7 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
       );
       await LocalDb.addGeo(Geo(
         prev: LocalDb.lastGeo,
+        task: task,
         start: measureStart,
         lat: pos.latitude,
         lon: pos.longitude,
@@ -81,6 +84,7 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
       LocalDb.addError(e, s); // без await, игнорим возможную ошибку записи ошибки
       LocalDb.addGeo(Geo(
         prev: LocalDb.lastGeo,
+        task: task,
         start: measureStart,
         err: e.toString(),
       ));
@@ -92,5 +96,5 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
       break;
     }
   }
-  return true;
+  return false; // перезапускаем задачу, как будто возникла ошибка
 }
