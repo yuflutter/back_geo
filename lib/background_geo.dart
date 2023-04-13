@@ -19,8 +19,14 @@ class BackgroundGeo {
     //   LocalDb.addError('Предоставьте разрешения');
     //   return;
     // }
-    if ((await Geolocator.checkPermission()) == LocationPermission.denied) {
+    if (!(await Geolocator.isLocationServiceEnabled())) {
+      await Geolocator.openLocationSettings();
+    }
+    if ([LocationPermission.denied, LocationPermission.deniedForever].contains(await Geolocator.checkPermission())) {
       await Geolocator.requestPermission();
+    }
+    if ((await Geolocator.checkPermission()) != LocationPermission.always) {
+      await Geolocator.openAppSettings();
     }
     await Workmanager().initialize(
       _backgroundDispatcher,
@@ -42,40 +48,43 @@ void _backgroundDispatcher() {
 }
 
 Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async {
-  final tstart = DateTime.now();
-  try {
-    await LocalDb.init();
+  await LocalDb.init();
+  for (int i = 1; i <= 15; i++) {
     final tstart = DateTime.now();
-    // final _loc = Location();
-    // if (!(await _loc.serviceEnabled()) && !(await _loc.requestService())) {
-    //   LocalDb.addError('Включите геолокацию');
-    //   return false;
-    // }
-    // if ((await _loc.hasPermission()) == PermissionStatus.denied &&
-    //     (await _loc.requestPermission()) != PermissionStatus.granted) {
-    //   LocalDb.addError('Предоставьте разрешения');
-    //   return false;
-    // }
-    // final geo = await _loc.getLocation();
-    final pos = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-      timeLimit: Duration(seconds: 30),
-      // forceAndroidLocationManager: true,
-    );
-    await LocalDb.addGeo(Geo(
-      prev: LocalDb.lastGeo,
-      start: tstart,
-      lat: pos.latitude,
-      lon: pos.longitude,
-    ));
-    return false; // перезапускаем задачу, как будто возникла ошибка
-  } catch (e, s) {
-    LocalDb.addError(e, s); // без await, игнорим возможную ошибку записи ошибки
-    await LocalDb.addGeo(Geo(
-      prev: LocalDb.lastGeo,
-      start: tstart,
-      err: e.toString(),
-    ));
-    return false;
+    try {
+      // final _loc = Location();
+      // if (!(await _loc.serviceEnabled()) && !(await _loc.requestService())) {
+      //   LocalDb.addError('Включите геолокацию');
+      //   return false;
+      // }
+      // if ((await _loc.hasPermission()) == PermissionStatus.denied &&
+      //     (await _loc.requestPermission()) != PermissionStatus.granted) {
+      //   LocalDb.addError('Предоставьте разрешения');
+      //   return false;
+      // }
+      // final geo = await _loc.getLocation();
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 30),
+        // forceAndroidLocationManager: true,
+      );
+      await LocalDb.addGeo(Geo(
+        prev: LocalDb.lastGeo,
+        start: tstart,
+        lat: pos.latitude,
+        lon: pos.longitude,
+      ));
+      await Future.delayed(Duration(seconds: 60));
+      // return false; // перезапускаем задачу, как будто возникла ошибка
+    } catch (e, s) {
+      LocalDb.addError(e, s); // без await, игнорим возможную ошибку записи ошибки
+      await LocalDb.addGeo(Geo(
+        prev: LocalDb.lastGeo,
+        start: tstart,
+        err: e.toString(),
+      ));
+      // return false;
+    }
   }
+  return true;
 }

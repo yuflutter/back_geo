@@ -40,10 +40,13 @@ class _HomeScreen extends State<HomeScreen> {
                 flex: 2,
                 child: ListView(
                   children: [
-                    ...LocalDb.allGeosJson.reversed.map(
+                    ...LocalDb.allGeos.reversed.map(
                       (e) => Column(
                         children: [
-                          Text(e),
+                          Text(
+                            e.toJson(),
+                            style: (e.gap <= 1) ? null : TextStyle(color: Colors.purple),
+                          ),
                           Divider(),
                         ],
                       ),
