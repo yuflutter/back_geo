@@ -3,7 +3,7 @@ import 'package:geolocator/geolocator.dart';
 // import 'package:location/location.dart';
 
 import '/geo.dart';
-import 'local_db.dart';
+import '/local_db.dart';
 
 const _taskName = 'backgroundGeo';
 
@@ -34,8 +34,8 @@ class BackgroundGeo {
     );
     await Workmanager().registerPeriodicTask(
       _taskName,
-      '$_taskName-01',
-      frequency: Duration(minutes: 5), // реально в андроиде все равно будет 15
+      _taskName,
+      frequency: Duration(minutes: 15), // реально в андроиде все равно будет 15
       backoffPolicy: BackoffPolicy.linear,
       backoffPolicyDelay: Duration(seconds: 45),
     );
@@ -49,8 +49,9 @@ void _backgroundDispatcher() {
 
 Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async {
   await LocalDb.init();
-  for (int i = 1; i <= 15; i++) {
-    final tstart = DateTime.now();
+  final taskStart = DateTime.now();
+  do {
+    final measureStart = DateTime.now();
     try {
       // final _loc = Location();
       // if (!(await _loc.serviceEnabled()) && !(await _loc.requestService())) {
@@ -65,12 +66,12 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
       // final geo = await _loc.getLocation();
       final pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 30),
+        timeLimit: Duration(seconds: 45),
         // forceAndroidLocationManager: true,
       );
       await LocalDb.addGeo(Geo(
         prev: LocalDb.lastGeo,
-        start: tstart,
+        start: measureStart,
         lat: pos.latitude,
         lon: pos.longitude,
       ));
@@ -78,13 +79,13 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
       // return false; // перезапускаем задачу, как будто возникла ошибка
     } catch (e, s) {
       LocalDb.addError(e, s); // без await, игнорим возможную ошибку записи ошибки
-      await LocalDb.addGeo(Geo(
+      LocalDb.addGeo(Geo(
         prev: LocalDb.lastGeo,
-        start: tstart,
+        start: measureStart,
         err: e.toString(),
       ));
       // return false;
     }
-  }
+  } while (DateTime.now().difference(taskStart).inMinutes < 14);
   return true;
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'local_db.dart';
-import 'background_geo.dart';
-import 'home_screen.dart';
+import '/local_db.dart';
+import '/background_geo.dart';
+import '/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

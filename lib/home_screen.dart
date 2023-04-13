@@ -16,7 +16,7 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   initState() {
     _timer = Timer.periodic(
-      Duration(seconds: 10),
+      Duration(seconds: 5),
       (_) => _refresh(),
     );
     super.initState();
