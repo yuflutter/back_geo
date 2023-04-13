@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import 'local_db.dart';
+import '/local_db.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -37,25 +37,31 @@ class _HomeScreen extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
+                flex: 2,
                 child: ListView(
                   children: [
-                    ...LocalDb.getGeos().reversed.map(
-                          (e) => Text(e),
-                        ),
+                    ...LocalDb.allGeosJson.reversed.map(
+                      (e) => Column(
+                        children: [
+                          Text(e),
+                          Divider(),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
               Expanded(
                 child: ListView(
                   children: [
-                    ...LocalDb.getErrors().reversed.map(
-                          (e) => Column(
-                            children: [
-                              Divider(color: Colors.red),
-                              Text(e, style: const TextStyle(color: Colors.red)),
-                            ],
-                          ),
-                        ),
+                    ...LocalDb.allErrors.reversed.map(
+                      (e) => Column(
+                        children: [
+                          Divider(color: Colors.red),
+                          Text(e, style: const TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

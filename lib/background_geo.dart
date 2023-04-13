@@ -2,6 +2,7 @@ import 'package:workmanager/workmanager.dart';
 import 'package:geolocator/geolocator.dart';
 // import 'package:location/location.dart';
 
+import '/geo.dart';
 import 'local_db.dart';
 
 const _taskName = 'backgroundGeo';
@@ -30,7 +31,7 @@ class BackgroundGeo {
       '$_taskName-01',
       frequency: Duration(minutes: 5), // реально в андроиде все равно будет 15
       backoffPolicy: BackoffPolicy.linear,
-      backoffPolicyDelay: Duration(seconds: 30),
+      backoffPolicyDelay: Duration(seconds: 45),
     );
   }
 }
@@ -41,8 +42,10 @@ void _backgroundDispatcher() {
 }
 
 Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async {
+  final tstart = DateTime.now();
   try {
     await LocalDb.init();
+    final tstart = DateTime.now();
     // final _loc = Location();
     // if (!(await _loc.serviceEnabled()) && !(await _loc.requestService())) {
     //   LocalDb.addError('Включите геолокацию');
@@ -54,15 +57,25 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
     //   return false;
     // }
     // final geo = await _loc.getLocation();
-    final geo = await Geolocator.getCurrentPosition(
+    final pos = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
-      timeLimit: Duration(seconds: 45),
+      timeLimit: Duration(seconds: 30),
       // forceAndroidLocationManager: true,
     );
-    await LocalDb.addGeo({'t': DateTime.now(), 'la': geo.latitude, 'lo': geo.longitude});
+    await LocalDb.addGeo(Geo(
+      prev: LocalDb.lastGeo,
+      start: tstart,
+      lat: pos.latitude,
+      lon: pos.longitude,
+    ));
     return false; // перезапускаем задачу, как будто возникла ошибка
   } catch (e, s) {
     LocalDb.addError(e, s); // без await, игнорим возможную ошибку записи ошибки
+    await LocalDb.addGeo(Geo(
+      prev: LocalDb.lastGeo,
+      start: tstart,
+      err: e.toString(),
+    ));
     return false;
   }
 }
