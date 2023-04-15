@@ -1,24 +1,13 @@
 import 'package:workmanager/workmanager.dart';
 import 'package:geolocator/geolocator.dart';
-// import 'package:location/location.dart';
 
 import '/geo.dart';
 import '/local_db.dart';
 
-const _taskName = 'back-geo';
+const _taskName = 'bg';
 
 class BackgroundGeo {
   static Future<void> init() async {
-    // _loc = Location();
-    // if (!(await _loc.serviceEnabled()) && !(await _loc.requestService())) {
-    //   LocalDb.addError('Включите геолокацию');
-    //   return;
-    // }
-    // if ((await _loc.hasPermission()) == PermissionStatus.denied &&
-    //     (await _loc.requestPermission()) != PermissionStatus.granted) {
-    //   LocalDb.addError('Предоставьте разрешения');
-    //   return;
-    // }
     if (!(await Geolocator.isLocationServiceEnabled())) {
       await Geolocator.openLocationSettings();
     }
@@ -37,9 +26,9 @@ class BackgroundGeo {
       _taskName,
       '$_taskName-${await LocalDb.incLastTaskId()}',
       frequency: Duration(minutes: 15), // реально в андроиде все равно будет 15
-      existingWorkPolicy: ExistingWorkPolicy.append,
       backoffPolicy: BackoffPolicy.linear,
       backoffPolicyDelay: Duration(seconds: 45),
+      // existingWorkPolicy: ExistingWorkPolicy.append,
       // outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
     );
   }
@@ -56,17 +45,6 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
   while (true) {
     final measureStart = DateTime.now();
     try {
-      // final _loc = Location();
-      // if (!(await _loc.serviceEnabled()) && !(await _loc.requestService())) {
-      //   LocalDb.addError('Включите геолокацию');
-      //   return false;
-      // }
-      // if ((await _loc.hasPermission()) == PermissionStatus.denied &&
-      //     (await _loc.requestPermission()) != PermissionStatus.granted) {
-      //   LocalDb.addError('Предоставьте разрешения');
-      //   return false;
-      // }
-      // final geo = await _loc.getLocation();
       final pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
         timeLimit: Duration(seconds: 45),
@@ -79,7 +57,6 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
         lat: pos.latitude,
         lon: pos.longitude,
       ));
-      // return false; // перезапускаем задачу, как будто возникла ошибка
     } catch (e, s) {
       LocalDb.addError(e, s); // без await, игнорим возможную ошибку записи ошибки
       LocalDb.addGeo(Geo(
@@ -88,13 +65,13 @@ Future<bool> _backgroundTask(String task, Map<String, dynamic>? inputData) async
         start: measureStart,
         err: e.toString(),
       ));
-      // return false;
     }
-    if (DateTime.now().difference(taskStart).inMinutes <= 13) {
-      await Future.delayed(Duration(seconds: 60));
-    } else {
-      break;
-    }
+    await Future.delayed(Duration(seconds: 60));
+    // if (DateTime.now().difference(taskStart).inMinutes <= 13) {
+    //   await Future.delayed(Duration(seconds: 60));
+    // } else {
+    //   break;
+    // }
   }
   return false; // перезапускаем задачу, как будто возникла ошибка
 }
